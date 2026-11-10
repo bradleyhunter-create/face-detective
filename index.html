@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Face Detective – A Portrait Made of Words</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbf6ee;--ink:#1f2a37;--muted:#6b7280;--line:#e7dfd2;--card:#fff;--accent:#e2553f;--accent2:#2f6fde;--ok:#2e9d5b;--bad:#d9412f;--soft:#fff4e8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Nunito,system-ui,sans-serif;font-size:16px;line-height:1.45}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px;padding:16px 22px;border-bottom:2px solid var(--line);background:#fffdf9}
+h1{font-family:Fredoka,sans-serif;font-weight:600;font-size:26px;margin:0;letter-spacing:.2px}
+h1 span{color:var(--accent)}
+.sub{color:var(--muted);font-size:14px;margin-top:2px}
+.tabs{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.tab{font:inherit;font-weight:800;border:2px solid var(--line);background:#fff;border-radius:999px;padding:8px 16px;cursor:pointer;color:var(--ink)}
+.tab[aria-selected=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.app{display:grid;grid-template-columns:300px minmax(280px,1fr) 400px;gap:18px;max-width:1320px;margin:0 auto;padding:18px}
+@media (max-width:1080px){.app{grid-template-columns:1fr}.stage{position:static!important}}
+.card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px}
+.card h2{font-family:Fredoka,sans-serif;font-weight:600;font-size:19px;margin:0 0 8px}
+.card p{margin:6px 0}
+.small{font-size:14px;color:var(--muted)}
+.btn{font:inherit;font-weight:800;border:none;border-radius:12px;padding:10px 14px;cursor:pointer;background:var(--ink);color:#fff;width:100%;margin-top:8px}
+.btn.accent{background:var(--accent)}
+.btn.blue{background:var(--accent2)}
+.btn.ghost{background:#fff;color:var(--ink);border:2px solid var(--line)}
+.btn:focus-visible,.chip:focus-visible,.tab:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
+.seg{display:flex;gap:6px;margin:6px 0 4px}
+.seg button{flex:1}
+.desc{background:var(--soft);border:2px dashed #f0c9a3;border-radius:14px;padding:12px 14px;font-size:18px;line-height:1.6}
+.desc mark{background:#ffe08a;padding:0 3px;border-radius:4px;font-weight:800;color:var(--ink)}
+.stage{position:sticky;top:12px;align-self:start;text-align:center}
+.stage svg{width:100%;max-width:380px;height:auto;background:radial-gradient(circle at 50% 40%,#fff 0,#f4ede2 70%);border-radius:22px;border:2px solid var(--line)}
+.stage .cap{font-family:Fredoka,sans-serif;font-size:18px;margin-top:8px}
+.code{display:inline-block;font-family:Fredoka,sans-serif;font-size:28px;letter-spacing:4px;background:var(--ink);color:#fff;border-radius:12px;padding:4px 14px;margin-top:6px}
+.controls{display:flex;flex-direction:column;gap:12px}
+.group h3{font-family:Fredoka,sans-serif;font-weight:500;font-size:16px;margin:0 0 6px;display:flex;justify-content:space-between;align-items:baseline}
+.group h3 small{font-family:Nunito,sans-serif;font-size:12px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-weight:600;font-size:15px;border:2px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:var(--ink)}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip.neg[aria-pressed=true]{background:#7a5af5;border-color:#7a5af5}
+.chip .sw{width:14px;height:14px;border-radius:50%;border:1px solid rgba(0,0,0,.25)}
+.frames li{margin:6px 0;font-size:17px}
+.frames b{color:var(--accent)}
+.modal{position:fixed;inset:0;background:rgba(20,24,32,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
+.modal.open{display:flex}
+.modal .box{background:#fff;border-radius:20px;max-width:880px;width:100%;max-height:92vh;overflow:auto;padding:20px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;text-align:center}
+.pair svg{width:100%;max-width:260px;height:auto;border-radius:16px;border:2px solid var(--line);background:#f8f3ea}
+.pair h4{font-family:Fredoka;font-weight:500;margin:4px 0}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
+td,th{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left}
+th{font-size:13px;color:var(--muted);font-weight:800}
+.ok{color:var(--ok);font-weight:800}.bad{color:var(--bad);font-weight:800}
+.score{font-family:Fredoka;font-size:26px;margin:0}
+input.codein{font:inherit;font-family:Fredoka;font-size:24px;letter-spacing:4px;width:100%;padding:8px 12px;border:2px solid var(--line);border-radius:12px;text-align:center}
+.hidden{display:none!important}
+.tip{background:#eef4ff;border-radius:12px;padding:10px 12px;font-size:14px;margin-top:10px}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Face <span>Detective</span></h1>
+    <div class="sub">A Portrait Made of Words — read it, say it, build it.</div>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" data-mode="read">1 · Read &amp; Build</button>
+    <button class="tab" role="tab" data-mode="partner">2 · Partner Game</button>
+    <button class="tab" role="tab" data-mode="free">3 · Create a Character</button>
+  </nav>
+</header>
+
+<main class="app">
+  <section id="left" class="card"></section>
+  <section class="stage" id="stage"></section>
+  <section id="right" class="card"></section>
+</main>
+
+<div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
+
+<script>
+/* ---------- vocabulary ---------- */
+const OPTS={
+  face:['oval','round','square','long','heart-shaped'],
+  skin:['pale','light brown','dark'],
+  hairStyle:['bald','short straight','short spiky','short curly','shoulder-length straight','shoulder-length wavy','long straight','long curly'],
+  hairColour:['black','brown','blond','red','grey'],
+  forehead:['high','low'],
+  eyeColour:['brown','blue','green','grey'],
+  eyeSize:['large','small'],
+  mood:['happy','sad','kind','cold','curious'],
+  nose:['straight','small','long','bulbous','hooked'],
+  features:['glasses','beard','moustache','freckles','scar','birthmark','dimples'],
+  pos:['helpful','cheerful','friendly','kind','thoughtful','brainy','polite','lively','courageous','honest'],
+  neg:['lazy','greedy','selfish','jealous','cunning','mean','angry']
+};
+const LABEL={face:'Face shape',skin:'Skin',hairStyle:'Hair style',hairColour:'Hair colour',forehead:'Forehead',eyeColour:'Eye colour',eyeSize:'Eye size',mood:'Eyes look…',nose:'Nose',features:'Special features',character:'Character (inside)'};
+const HARD=['forehead','eyeSize','mood','nose'];
+const DEFAULT={face:'oval',skin:'light brown',hairStyle:'short straight',hairColour:'brown',forehead:'high',eyeColour:'brown',eyeSize:'large',mood:'happy',nose:'straight',features:[],character:[],pronoun:'they'};
+const HC={black:'#2b2220',brown:'#6b4226',blond:'#e3bf5f',red:'#c0502a',grey:'#a9a9a9'};
+const SK={'pale':'#f7dcc8','light brown':'#d39f78','dark':'#7a4b30'};
+const EC={brown:'#6b3f1f',blue:'#3d7fd1',green:'#3f9a4f',grey:'#8a949c'};
+const SHAPES={
+  oval:{top:80,chin:282,rx:78,el:[181,78,101]},
+  round:{top:92,chin:278,rx:92,el:[185,92,93]},
+  long:{top:66,chin:294,rx:66,el:[180,66,114]},
+  square:{top:82,chin:274,rx:80,path:'M70,122 Q70,82 110,82 L190,82 Q230,82 230,122 L230,230 Q230,274 186,274 L114,274 Q70,274 70,230 Z'},
+  'heart-shaped':{top:84,chin:286,rx:80,path:'M150,286 C112,266 70,224 70,166 C70,112 104,84 150,84 C196,84 230,112 230,166 C230,224 188,266 150,286 Z'}
+};
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const clone=o=>JSON.parse(JSON.stringify(o));
+function shade(hex,amt){const n=parseInt(hex.slice(1),16);let r=n>>16,g=n>>8&255,b=n&255;const t=amt<0?0:255,p=Math.abs(amt);r=Math.round((t-r)*p+r);g=Math.round((t-g)*p+g);b=Math.round((t-b)*p+b);return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1)}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function joinList(a){return a.length<2?(a[0]||''):a.slice(0,-1).join(', ')+' and '+a[a.length-1]}
+let uidN=0;
+
+/* ---------- drawing ---------- */
+function faceSVG(s,big){
+  const u='f'+(uidN++);
+  const G=SHAPES[s.face],rx=G.rx,top=G.top,chin=G.chin,cx=150;
+  const skin=SK[s.skin],skinD=shade(skin,-.22);
+  const bald=s.hairStyle==='bald';
+  const hc=HC[s.hairColour],hcD=shade(hc,-.25);
+  const brow=bald?'#5a3a24':(s.hairColour==='blond'?shade(hc,-.35):hcD);
+  const H=top+(s.forehead==='high'?26:52);
+  const L=cx-rx-7,R=cx+rx+7,T=top-14;
+  const mY=Math.min(chin-38,244);
+  const f=new Set(s.features);
+  const o=[];
+  // back hair
+  if(!bald){
+    const bottom=s.hairStyle.startsWith('shoulder')?300:s.hairStyle.startsWith('long')?342:0;
+    if(bottom){
+      if(s.hairStyle.endsWith('wavy')){
+        const y0=H+12;let d=`M${L+2},${y0} L${L-8},${y0+20}`;const n=Math.ceil((bottom-y0-20)/24);
+        for(let i=0;i<n;i++)d+=` q${i%2?8:-12},12 0,24`;
+        d+=` L${R+8},${y0+20+n*24}`;
+        for(let i=0;i<n;i++)d+=` q${i%2?-8:12},-12 0,-24`;
+        d+=` L${R-2},${y0} Z`;o.push(`<path d="${d}" fill="${hc}" stroke="${hcD}" stroke-width="2"/>`);
+      }else{
+        o.push(`<path d="M${L+2},${H+12} C${L-6},${H+60} ${L-12},${bottom-40} ${L-12},${bottom} L${R+12},${bottom} C${R+12},${bottom-40} ${R+6},${H+60} ${R-2},${H+12} Z" fill="${hc}" stroke="${hcD}" stroke-width="2"/>`);
+        if(s.hairStyle.endsWith('curly')){
+          for(const x0 of [L-6,L+8,R-8,R+6])for(let y=H+30;y<=bottom;y+=18)o.push(`<circle cx="${x0+((y/18)%2?4:-4)}" cy="${y}" r="13" fill="${hc}" stroke="${hcD}" stroke-width="1.5"/>`);
+        }
+      }
+    }
+  }
+  // shoulders + neck
+  o.push(`<path d="M30,360 Q40,316 126,306 L174,306 Q260,316 270,360 Z" fill="#5b7fbf" stroke="#45659e" stroke-width="2"/>`);
+  o.push(`<path d="M128,${chin-30} L128,312 Q150,326 172,312 L172,${chin-30} Z" fill="${skin}" stroke="${skinD}" stroke-width="2"/>`);
+  // ears
+  for(const sd of [-1,1])o.push(`<ellipse cx="${cx+sd*(rx-1)}" cy="186" rx="11" ry="19" fill="${skin}" stroke="${skinD}" stroke-width="2"/>`);
+  // face
+  o.push(G.el?`<ellipse cx="150" cy="${G.el[0]}" rx="${G.el[1]}" ry="${G.el[2]}" fill="${skin}" stroke="${skinD}" stroke-width="2.5"/>`:`<path d="${G.path}" fill="${skin}" stroke="${skinD}" stroke-width="2.5"/>`);
+  // skin features
+  if(s.mood==='kind'||s.mood==='happy')for(const sd of [-1,1])o.push(`<circle cx="${cx+sd*44}" cy="${mY-22}" r="11" fill="#f08a8a" opacity=".28"/>`);
+  if(f.has('freckles')){const pts=[[-50,-2],[-42,4],[-56,8],[-46,12],[-36,-4],[-60,0],[-40,14]];for(const sd of [-1,1])for(const [x,y] of pts)o.push(`<circle cx="${cx-sd*x}" cy="${200+y}" r="2.3" fill="#9a5b34" opacity=".8"/>`)}
+  if(f.has('birthmark'))o.push(`<path d="M106,${mY-30} q6,-7 13,-2 q7,4 3,11 q-4,7 -11,4 q-9,-4 -5,-13 Z" fill="#8a5a3c" opacity=".7"/>`);
+  if(f.has('scar')){o.push(`<path d="M178,186 L198,214" stroke="#b0635a" stroke-width="3" stroke-linecap="round"/>`);for(const t of [.25,.5,.75]){const x=178+20*t,y=186+28*t;o.push(`<path d="M${x-6},${y+4} L${x+6},${y-4}" stroke="#b0635a" stroke-width="2" stroke-linecap="round"/>`)}}
+  if(f.has('dimples'))for(const sd of [-1,1])o.push(`<path d="M${cx+sd*30},${mY-2} q${sd*3},5 0,9" stroke="${skinD}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`);
+  // eyes
+  const ery=(s.eyeSize==='large'?10:7)*(s.mood==='cold'?.65:s.mood==='kind'?.85:1);
+  const ir=s.eyeSize==='large'?7.5:5;
+  for(const sd of [-1,1]){
+    const ex=cx+sd*32,ey=176,id=`${u}e${sd>0?'r':'l'}`;
+    o.push(`<clipPath id="${id}"><ellipse cx="${ex}" cy="${ey}" rx="14" ry="${ery}"/></clipPath>`);
+    o.push(`<ellipse cx="${ex}" cy="${ey}" rx="14" ry="${ery}" fill="#fff" stroke="#3a2a22" stroke-width="2"/>`);
+    o.push(`<g clip-path="url(#${id})"><circle cx="${ex}" cy="${ey+1}" r="${ir}" fill="${EC[s.eyeColour]}"/><circle cx="${ex}" cy="${ey+1}" r="${ir*.42}" fill="#111"/><circle cx="${ex+2}" cy="${ey-2}" r="${ir*.25}" fill="#fff"/></g>`);
+    o.push(`<path d="M${ex-15},${ey-ery*.2} Q${ex},${ey-ery-3} ${ex+15},${ey-ery*.2}" stroke="#2a1d17" stroke-width="2.6" fill="none" stroke-linecap="round"/>`);
+    // brows
+    const inX=ex-sd*14,outX=ex+sd*14;let d;
+    switch(s.mood){
+      case 'sad':d=`M${outX},156 Q${ex},150 ${inX},146`;break;
+      case 'cold':d=`M${outX},153 L${inX},156`;break;
+      case 'curious':d=sd<0?`M${outX},146 Q${ex},134 ${inX},144`:`M${outX},154 Q${ex},149 ${inX},154`;break;
+      case 'kind':d=`M${outX},153 Q${ex},144 ${inX},151`;break;
+      default:d=`M${outX},152 Q${ex},141 ${inX},150`;
+    }
+    o.push(`<path d="${d}" stroke="${brow}" stroke-width="5" fill="none" stroke-linecap="round"/>`);
+  }
+  // nose
+  const nS=skinD;
+  switch(s.nose){
+    case 'small':o.push(`<path d="M144,203 Q150,209 156,203" stroke="${nS}" stroke-width="2.5" fill="none" stroke-linecap="round"/>`);break;
+    case 'long':o.push(`<path d="M148,172 L145,222 Q150,228 158,221" stroke="${nS}" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`);break;
+    case 'bulbous':o.push(`<path d="M148,182 L146,198" stroke="${nS}" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="150" cy="210" r="12" fill="${shade(skin,-.08)}" stroke="${nS}" stroke-width="2.2"/><circle cx="143" cy="214" r="2" fill="${nS}"/><circle cx="157" cy="214" r="2" fill="${nS}"/>`);break;
+    case 'hooked':o.push(`<path d="M147,176 Q168,194 157,214 Q151,218 144,212" stroke="${nS}" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`);break;
+    default:o.push(`<path d="M148,180 L145,207 Q150,213 157,207" stroke="${nS}" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`);
+  }
+  // beard
+  const bc=bald?'#5a3a24':hc,bcD=shade(bc,-.25);
+  if(f.has('beard'))o.push(`<path d="M${cx-rx+4},188 Q${cx-rx+4},${chin-8} 150,${chin+14} Q${cx+rx-4},${chin-8} ${cx+rx-4},188 L${cx+rx-16},200 Q150,${2*(mY-14)-200} ${cx-rx+16},200 Z" fill="${bc}" stroke="${bcD}" stroke-width="2"/>`);
+  // mouth
+  const mc='#8a2f2a';
+  switch(s.mood){
+    case 'sad':o.push(`<path d="M130,${mY+6} Q150,${mY-8} 170,${mY+6}" stroke="${mc}" stroke-width="3.5" fill="none" stroke-linecap="round"/>`);break;
+    case 'cold':o.push(`<path d="M134,${mY} L166,${mY}" stroke="${mc}" stroke-width="3.5" stroke-linecap="round"/>`);break;
+    case 'curious':o.push(`<ellipse cx="150" cy="${mY}" rx="5.5" ry="7" fill="${mc}"/>`);break;
+    case 'kind':o.push(`<path d="M134,${mY} Q150,${mY+10} 166,${mY}" stroke="${mc}" stroke-width="3.5" fill="none" stroke-linecap="round"/>`);break;
+    default:o.push(`<path d="M127,${mY-3} Q150,${mY+20} 173,${mY-3} Q150,${mY+6} 127,${mY-3} Z" fill="${mc}" stroke="${mc}" stroke-width="2.5" stroke-linejoin="round"/>`);
+  }
+  if(f.has('moustache')){const y=mY-13;o.push(`<path d="M150,${y} Q134,${y-9} 122,${y+5} Q137,${y+3} 150,${y+4} Q163,${y+3} 178,${y+5} Q166,${y-9} 150,${y} Z" fill="${bc}" stroke="${bcD}" stroke-width="1.5"/>`)}
+  // front hair
+  if(bald){o.push(`<path d="M${cx-30},${top+18} Q${cx-10},${top+6} ${cx+12},${top+12}" stroke="#fff" stroke-width="5" opacity=".45" fill="none" stroke-linecap="round"/>`)}
+  else{
+    const sideY=H+34;
+    o.push(`<path d="M${L},${sideY} C${L},${T+18} ${cx-rx*.55},${T} ${cx},${T} C${cx+rx*.55},${T} ${R},${T+18} ${R},${sideY} L${R-12},${sideY} Q${cx},${2*H-sideY} ${L+12},${sideY} Z" fill="${hc}" stroke="${hcD}" stroke-width="2"/>`);
+    if(s.hairStyle==='short spiky'){
+      for(let i=0;i<7;i++){const x=L+14+i*(R-L-28)/6,k=(x-cx)/(rx+7),yb=T+4+22*k*k,tip=yb-20-(i%2)*7;o.push(`<path d="M${x-12},${yb+10} L${x},${tip} L${x+12},${yb+10} Z" fill="${hc}" stroke="${hcD}" stroke-width="1.5" stroke-linejoin="round"/>`)}
+    }
+    if(s.hairStyle.endsWith('curly')){
+      const cy0=H+16,ry=cy0-T+2;
+      for(let i=0;i<=10;i++){const a=Math.PI+i*Math.PI/10;o.push(`<circle cx="${cx+(rx+6)*Math.cos(a)}" cy="${cy0+ry*Math.sin(a)}" r="13" fill="${hc}" stroke="${hcD}" stroke-width="1.5"/>`)}
+    }
+    if(s.hairStyle.endsWith('wavy')){
+      o.push(`<path d="M${cx-rx*.5},${T+14} q12,10 24,0 q12,-10 24,0" stroke="${hcD}" stroke-width="2" fill="none"/>`);
+    }
+  }
+  // glasses
+  if(f.has('glasses')){
+    o.push(`<g fill="rgba(255,255,255,.12)" stroke="#262626" stroke-width="3.5"><circle cx="118" cy="177" r="19"/><circle cx="182" cy="177" r="19"/></g><path d="M137,175 Q150,168 163,175 M99,174 L${cx-rx+2},170 M201,174 L${cx+rx-2},170" stroke="#262626" stroke-width="3.5" fill="none" stroke-linecap="round"/>`);
+  }
+  const lab=describe(s,'hard',true).replace(/<[^>]+>/g,'');
+  return `<svg viewBox="0 0 300 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${lab}">${o.join('')}</svg>`;
+}
+
+/* ---------- words ---------- */
+function describe(s,level,withChar){
+  const m=w=>`<mark>${w}</mark>`;
+  const p=s.pronoun||'they',P={he:'He',she:'She',they:'They'}[p];
+  const has=p==='they'?'have':'has',is=p==='they'?'are':'is',wears=p==='they'?'wear':'wears',poss={he:'His',she:'Her',they:'Their'}[p];
+  const out=[];
+  out.push(`${P} ${has} ${s.face==='oval'?'an':'a'} ${m(s.face)} face and ${m(s.skin)} skin.`);
+  if(s.hairStyle==='bald')out.push(`${P} ${is} ${m('bald')}.`);
+  else out.push(`${P} ${has} ${m(s.hairStyle)} ${m(s.hairColour)} hair`+(level==='hard'?` and a ${m(s.forehead)} forehead.`:'.'));
+  if(level==='hard'){out.push(`${poss} eyes are ${m(s.eyeSize)}, ${m(s.mood)} and ${m(s.eyeColour)}.`);out.push(`${P} ${has} a ${m(s.nose)} nose.`)}
+  else out.push(`${poss} eyes are ${m(s.eyeColour)}.`);
+  const art={beard:'a beard',moustache:'a moustache',scar:'a scar',birthmark:'a birthmark'};
+  const hasF=s.features.filter(x=>x!=='glasses').map(x=>art[x]?art[x].replace(x,m(x)):m(x));
+  if(s.features.includes('glasses'))out.push(`${P} ${wears} ${m('glasses')}.`);
+  if(hasF.length)out.push(`${P} ${s.features.includes('glasses')?'also ':''}${has} ${joinList(hasF)}.`);
+  if(withChar&&s.character&&s.character.length)out.push(`${P} ${is} ${joinList(s.character.map(m))}.`);
+  return out.join(' ');
+}
+
+function randomFace(level,rand){
+  const pick=a=>a[Math.floor(rand()*a.length)];
+  const f=clone(DEFAULT);
+  f.pronoun=rand()<.5?'he':'she';
+  for(const k of ['face','skin','hairStyle','hairColour','eyeColour'])f[k]=pick(OPTS[k]);
+  if(level==='hard')for(const k of HARD)f[k]=pick(OPTS[k]);
+  const pool=OPTS.features.filter(x=>!(f.pronoun==='she'&&(x==='beard'||x==='moustache')));
+  const n=level==='easy'?(rand()<.65?1:0):1+Math.floor(rand()*3);
+  while(f.features.length<n){const x=pick(pool);if(!f.features.includes(x))f.features.push(x)}
+  return f;
+}
+function compareKeys(level,t){
+  let k=['face','skin','hairStyle','hairColour'];
+  if(level==='hard')k.push('forehead');
+  k.push('eyeColour');
+  if(level==='hard')k.push('eyeSize','mood','nose');
+  k.push('features');
+  if(t.hairStyle==='bald')k=k.filter(x=>x!=='hairColour'&&x!=='forehead');
+  return k;
+}
+
+/* ---------- app state ---------- */
+const S={mode:'read',level:'easy',cur:clone(DEFAULT),target:null,role:null,secret:null,code:null};
+function codeLevel(c){return c<5000?'easy':'hard'}
+function newCode(level){return level==='easy'?1000+Math.floor(Math.random()*4000):5000+Math.floor(Math.random()*5000)}
+function faceFromCode(c){return randomFace(codeLevel(c),mulberry32(c*7919+13))}
+
+function setMode(m){S.mode=m;S.role=null;S.cur=clone(DEFAULT);if(m==='read')S.target=randomFace(S.level,Math.random);if(m==='free')S.cur.pronoun='she';document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.mode===m));render()}
+
+function levelSeg(){return `<div class="seg" role="group" aria-label="Level"><button class="btn ${S.level==='easy'?'accent':'ghost'}" data-level="easy">Easy</button><button class="btn ${S.level==='hard'?'accent':'ghost'}" data-level="hard">Hard</button></div><p class="small">${S.level==='easy'?'Face, skin, hair, eye colour, special features.':'Everything: forehead, eye size and look, nose too.'}</p>`}
+
+function render(){
+  const left=$('#left'),stage=$('#stage'),right=$('#right');
+  let showBuilder=true,builderLevel=S.level,showChar=false;
+  if(S.mode==='read'){
+    left.innerHTML=`<h2>Read &amp; Build</h2>${levelSeg()}<p class="small" style="margin-top:12px">Read the description. Build the person. Then check.</p><div class="desc">${describe(S.target,S.level)}</div><button class="btn accent" id="check">Check my face</button><button class="btn ghost" id="newT">New description</button>`;
+  }else if(S.mode==='partner'){
+    if(!S.role){
+      showBuilder=false;
+      left.innerHTML=`<h2>Partner Game</h2><p>One person <b>describes</b>, one person <b>builds</b>. Use two devices.</p><p class="small">Both partners choose the same level.</p>${levelSeg()}<button class="btn accent" id="roleA">🗣️ I describe (Partner A)</button><button class="btn blue" id="roleB">🛠️ I build (Partner B)</button>`;
+      stage.innerHTML=`<div class="card" style="text-align:left"><h2>How to play</h2><ol class="frames"><li><b>A</b> sees a secret face. Don't show it!</li><li><b>A</b> describes it in full sentences.</li><li><b>B</b> builds it and can ask questions: <i>“Is her hair curly or wavy?”</i></li><li><b>A</b> says the code. <b>B</b> types it in and checks.</li><li>Swap roles.</li></ol></div>`;
+      right.innerHTML=`<h2>Questions B can ask</h2><ul class="frames"><li>What shape is ${'his/her'} face?</li><li>What colour is ${'his/her'} hair?</li><li>Is it long or short? Curly or straight?</li><li>What are ${'his/her'} eyes like?</li><li>Does ${'he/she'} have any special features?</li><li>Can you say that again, please?</li></ul>`;
+      bind();return;
+    }
+    if(S.role==='A'){
+      showBuilder=false;
+      left.innerHTML=`<h2>You are Partner A</h2><p><b>Don't show your screen.</b> Describe the face in full sentences. Answer your partner's questions.</p><p>When your partner is finished, tell them the code:</p><div class="code">${S.code}</div><p class="small">Level: ${codeLevel(S.code)}</p><button class="btn ghost" id="newSecret">New secret face</button><button class="btn ghost" id="back">← Back</button>`;
+      stage.innerHTML=faceSVG(S.secret)+`<div class="cap">Secret face 🤫</div>`;
+      const P=S.secret.pronoun==='he'?'He':'She',Ps=S.secret.pronoun==='he'?'His':'Her';
+      right.innerHTML=`<h2>Sentence starters</h2><ul class="frames"><li>${P} has a <b>___</b> face and <b>___</b> skin.</li><li>${P} has <b>___ ___ ___</b> hair.<br><span class="small">(length · style · colour)</span></li>${codeLevel(S.code)==='hard'?`<li>${P} has a <b>high / low</b> forehead.</li><li>${Ps} eyes are <b>___</b>, <b>___</b> and <b>___</b>.<br><span class="small">(size · look · colour)</span></li><li>${P} has a <b>___</b> nose.</li>`:`<li>${Ps} eyes are <b>___</b>.</li>`}<li>${P} wears <b>glasses</b>. / ${P} has <b>freckles</b>, <b>a scar</b>…</li></ul><div class="tip">Use the words from the Builder: <i>oval, curly, bulbous, freckles…</i></div>`;
+      bind();return;
+    }
+    builderLevel=S.level;
+    left.innerHTML=`<h2>You are Partner B</h2><p>Listen. Ask questions. Build the face.</p><p class="small">Finished? Ask your partner for the code.</p><input class="codein" id="codeIn" inputmode="numeric" maxlength="4" placeholder="code" aria-label="Code from partner"><button class="btn accent" id="reveal">Reveal &amp; compare</button><p id="codeErr" class="bad small"></p><button class="btn ghost" id="back">← Back</button>`;
+  }else{
+    builderLevel='hard';showChar=true;
+    left.innerHTML=`<h2>Create a Character</h2><p class="small">Build a person for your slide. Choose 2–3 character words too.</p><div class="seg">${['he','she','they'].map(p=>`<button class="btn ${S.cur.pronoun===p?'accent':'ghost'}" data-pron="${p}">${p}</button>`).join('')}</div><div class="desc" id="liveDesc">${describe(S.cur,'hard',true)}</div><button class="btn accent" id="copy">Copy description</button><button class="btn ghost" id="rand">🎲 Surprise me</button><button class="btn ghost" id="reset">Start again</button><p id="copyMsg" class="small"></p><div class="tip"><b>Your slide:</b> screenshot the face, paste the description, then add one sentence: <i>Is this person beautiful? Inside, outside, or both? Why?</i></div>`;
+  }
+  if(showBuilder){
+    stage.innerHTML=faceSVG(S.cur)+`<div class="cap">${S.mode==='free'?'Your character':'Your face'}</div>`;
+    right.innerHTML=builderHTML(builderLevel,showChar);
+  }
+  bind();
+}
+
+function builderHTML(level,showChar){
+  const sw={hairColour:HC,eyeColour:EC,skin:SK};
+  let h='<div class="controls">';
+  for(const k of ['face','skin','hairStyle','hairColour','forehead','eyeColour','eyeSize','mood','nose','features']){
+    if(level==='easy'&&HARD.includes(k))continue;
+    const multi=k==='features';
+    h+=`<div class="group"><h3>${LABEL[k]}${multi?'<small>choose any</small>':''}</h3><div class="chips">`;
+    for(const v of OPTS[k]){
+      const on=multi?S.cur.features.includes(v):S.cur[k]===v;
+      h+=`<button class="chip" data-k="${k}" data-v="${v}" aria-pressed="${on}">${sw[k]?`<span class="sw" style="background:${sw[k][v]}"></span>`:''}${v}</button>`;
+    }
+    h+='</div></div>';
+  }
+  if(showChar){
+    h+=`<div class="group"><h3>${LABEL.character}<small>max 3</small></h3><div class="chips">`;
+    for(const v of OPTS.pos)h+=`<button class="chip" data-k="character" data-v="${v}" aria-pressed="${S.cur.character.includes(v)}">${v}</button>`;
+    h+=`</div><div class="chips" style="margin-top:6px">`;
+    for(const v of OPTS.neg)h+=`<button class="chip neg" data-k="character" data-v="${v}" aria-pressed="${S.cur.character.includes(v)}">${v}</button>`;
+    h+='</div></div>';
+  }
+  return h+'</div>';
+}
+
+function bind(){
+  document.querySelectorAll('[data-level]').forEach(b=>b.onclick=()=>{S.level=b.dataset.level;if(S.mode==='read'){S.target=randomFace(S.level,Math.random);S.cur=clone(DEFAULT)}render()});
+  document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{
+    const k=b.dataset.k,v=b.dataset.v;
+    if(k==='features'||k==='character'){const a=S.cur[k];const i=a.indexOf(v);if(i>=0)a.splice(i,1);else{if(k==='character'&&a.length>=3)a.shift();a.push(v)}}
+    else S.cur[k]=v;
+    const y=window.scrollY;render();window.scrollTo(0,y);
+  });
+  const on=(id,fn)=>{const e=document.getElementById(id);if(e)e.onclick=fn};
+  on('check',()=>showResult(S.target,S.level,'The description'));
+  on('newT',()=>{S.target=randomFace(S.level,Math.random);S.cur=clone(DEFAULT);render()});
+  on('roleA',()=>{S.role='A';S.code=newCode(S.level);S.secret=faceFromCode(S.code);render()});
+  on('roleB',()=>{S.role='B';S.cur=clone(DEFAULT);render()});
+  on('newSecret',()=>{S.code=newCode(S.level);S.secret=faceFromCode(S.code);render()});
+  on('back',()=>{S.role=null;render()});
+  on('reveal',()=>{const c=parseInt(($('#codeIn').value||'').trim(),10);if(!(c>=1000&&c<=9999)){$('#codeErr').textContent='Type the 4-digit code from your partner.';return}showResult(faceFromCode(c),codeLevel(c),"Partner A's face")});
+  document.querySelectorAll('[data-pron]').forEach(b=>b.onclick=()=>{S.cur.pronoun=b.dataset.pron;render()});
+  on('rand',()=>{const ch=S.cur.character,pr=S.cur.pronoun;S.cur=randomFace('hard',Math.random);S.cur.character=ch;S.cur.pronoun=pr;render()});
+  on('reset',()=>{S.cur=clone(DEFAULT);S.cur.pronoun='she';render()});
+  on('copy',async()=>{const t=describe(S.cur,'hard',true).replace(/<[^>]+>/g,'');try{await navigator.clipboard.writeText(t);$('#copyMsg').textContent='Copied! Paste it into your slide.'}catch(e){const r=document.createRange();r.selectNodeContents($('#liveDesc'));const sel=getSelection();sel.removeAllRanges();sel.addRange(r);$('#copyMsg').textContent='Text selected — press Ctrl+C (or ⌘+C) to copy.'}});
+}
+
+function showResult(t,level,tLabel){
+  const keys=compareKeys(level,t);let right=0;
+  const rows=keys.map(k=>{
+    let a,b,ok;
+    if(k==='features'){a=t.features.slice().sort().join(', ')||'none';b=S.cur.features.slice().sort().join(', ')||'none';ok=a===b}
+    else{a=t[k];b=S.cur[k];ok=a===b}
+    if(ok)right++;
+    return `<tr><td>${LABEL[k]}</td><td>${a}</td><td>${b}</td><td class="${ok?'ok':'bad'}">${ok?'✓':'✗'}</td></tr>`;
+  }).join('');
+  const all=right===keys.length;
+  $('#modalBox').innerHTML=`<p class="score">${all?'🕵️ Perfect portrait!':`${right} / ${keys.length} correct`}</p><p class="small">${all?'Every detail matches. Try Hard level, or swap roles.':'Look at the ✗ rows. Which word did you miss?'}</p><div class="pair"><div><h4>${tLabel}</h4>${faceSVG(t)}</div><div><h4>Your face</h4>${faceSVG(S.cur)}</div></div><table><tr><th>Category</th><th>Correct</th><th>You chose</th><th></th></tr>${rows}</table><div class="seg" style="margin-top:14px"><button class="btn ghost" id="mClose">Keep trying</button>${S.mode==='read'?'<button class="btn accent" id="mNext">Next description →</button>':'<button class="btn accent" id="mSwap">Swap roles</button>'}</div>`;
+  $('#modal').classList.add('open');
+  $('#mClose').onclick=()=>$('#modal').classList.remove('open');
+  const n=document.getElementById('mNext');if(n)n.onclick=()=>{$('#modal').classList.remove('open');S.target=randomFace(S.level,Math.random);S.cur=clone(DEFAULT);render()};
+  const sw=document.getElementById('mSwap');if(sw)sw.onclick=()=>{$('#modal').classList.remove('open');S.role='A';S.code=newCode(S.level);S.secret=faceFromCode(S.code);render()};
+}
+$('#modal').onclick=e=>{if(e.target.id==='modal')$('#modal').classList.remove('open')};
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>setMode(t.dataset.mode));
+setMode('read');
+</script>
+</body>
+</html>
